@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<!-- Carrusel Publicitario Dinámico -->
+<div id="promoCarousel" class="carousel slide shadow-sm" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        {% for banner in banners %}
+        <div class="carousel-item {% if loop.first %}active{% endif %}">
+            <img src="{{ banner.url_imagen }}" class="d-block w-100" alt="Publicidad DigitalPro">
+            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-3">
+                <h5 class="fw-bold text-white fs-3">{{ banner.titulo }}</h5>
+                <p class="text-light fs-5">{{ banner.subtitulo }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Buscador por Texto y Categorías -->
+<div class="row mb-4 justify-content-center text-center" id="seccion-busqueda">
+    <div class="col-md-8">
+        <h2 class="fw-bold text-dark">Catálogo de Equipos y Suministros</h2>
+        <p class="text-muted">Encuentra herramientas tecnológicas filtrando por la categoría que necesites.</p>
+        
+        <div class="input-group input-group-lg shadow-sm my-4">
+            <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+            <input type="text" id="buscador" class="form-control border-start-0" placeholder="¿Qué estás buscando? (Ej. laptop, epson, router...)">
+        </div>
+
+        <div class="d-flex flex-wrap justify-content-center gap-2" id="botones-categoria">
+            <button class="btn btn-primary active" onclick="filtrarCategoria('todos')">Todos los Productos</button>
+            <button class="btn btn-outline-primary" onclick="filtrarCategoria('computadora')"><i class="bi bi-laptop"></i> Computadoras</button>
+            <button class="btn btn-outline-primary" onclick="filtrarCategoria('impresora')"><i class="bi bi-printer"></i> Impresoras</button>
+            <button class="btn btn-outline-primary" onclick="filtrarCategoria('otros')"><i class="bi bi-box-seam"></i> Otros</button>
+        </div>
+    </div>
+</div>
+
+<!-- Grilla del Catálogo -->
+<div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+    {% for producto in productos %}
+    <div class="col tarjeta-producto" data-nombre="{{ producto.nombre | lower }}" data-categoria="{{ producto.categoria }}">
+        <div class="card h-100 shadow-sm border-0">
+            <img src="{{ producto.imagen }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ producto.nombre }}">
+            <div class="card-body d-flex flex-column">
+                <span class="badge bg-light text-primary border border-primary mb-2 align-self-start text-uppercase fs-7">{{ producto.categoria }}</span>
+                <h5 class="card-title fw-bold text-dark">{{ producto.nombre }}</h5>
+                <p class="card-text text-muted flex-grow-1 fs-6">{{ producto.descripcion }}</p>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <span class="text-success fs-5 fw-bold">{{ producto.precio }}</span>
+                    <a href="https://wa.me/tu_numero" target="_blank" class="btn btn-success btn-sm">
+                        <i class="bi bi-whatsapp"></i> Cotizar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div id="sin-resultados" class="text-center my-5 d-none">
+    <i class="bi bi-emoji-frown display-4 text-muted"></i>
+    <p class="fs-5 text-muted mt-2">No se encontraron productos con ese nombre.</p>
+</div>
+
+<hr class="my-5 opacity-25">
+
+<!-- Sección de Servicios Profesionales Fijos -->
+<div class="bg-white p-5 rounded-4 shadow-sm border mb-4">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-dark">Servicios Técnicos Especializados</h2>
+        <p class="text-muted fs-5">Soporte profesional en taller y a domicilio para mantener tus sistemas operativos.</p>
+    </div>
+
+    <div class="row g-4">
+        {% for servicio in servicios %}
+        <div class="col-md-4">
+            <div class="p-4 bg-light rounded-3 h-100 d-flex flex-column justify-content-between border">
+                <div>
+                    <div class="text-primary mb-3"><i class="bi {{ servicio.icono }} display-5"></i></div>
+                    <h4 class="fw-bold text-dark h5">{{ servicio.nombre }}</h4>
+                    <p class="text-muted fs-6 mt-2">{{ servicio.descripcion }}</p>
+                </div>
+                <div class="mt-4">
+                    <a href="https://wa.me/tu_numero" target="_blank" class="btn btn-outline-primary btn-sm w-100"><i class="bi bi-chat-right-text"></i> Solicitar Soporte</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Lógica interactiva en JavaScript -->
+<script>
+    let categoriaActual = 'todos';
+
+    function filtrarProductos() {
+        const query = document.getElementById('buscador').value.toLowerCase();
+        const tarjetas = document.querySelectorAll('.tarjeta-producto');
+        let visibles = 0;
+
+        tarjetas.forEach(tarjeta => {
+            const nombre = tarjeta.getAttribute('data-nombre');
+            const categoria = tarjeta.getAttribute('data-categoria');
+
+            const coincideTexto = nombre.includes(query);
+            const coincideCat = (categoriaActual === 'todos' || categoria === categoriaActual);
+
+            if (coincideTexto && coincideCat) {
+                tarjeta.classList.remove('d-none');
+                visibles++;
+            } else {
+                tarjeta.classList.add('d-none');
+            }
+        });
+
+        const aviso = document.getElementById('sin-resultados');
+        if (visibles === 0) { aviso.classList.remove('d-none'); } 
+        else { aviso.classList.add('d-none'); }
+    }
+
+    function filtrarCategoria(categoria) {
+        categoriaActual = categoria;
+        const botones = document.querySelectorAll('#botones-categoria .btn');
+        botones.forEach(btn => btn.classList.remove('active', 'btn-primary'));
+        botones.forEach(btn => btn.classList.add('btn-outline-primary'));
+
+        const botonActivo = event.target.closest('.btn');
+        botonActivo.classList.remove('btn-outline-primary');
+        botonActivo.classList.add('active', 'btn-primary');
+
+        filtrarProductos();
+    }
+
+    document.getElementById('buscador').addEventListener('input', filtrarProductos);
+</script>
+{% endblock %}

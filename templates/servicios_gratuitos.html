@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="text-center mb-5">
+    <h2 class="fw-bold text-primary"><i class="bi bi-heart-fill"></i> Servicios Gratuitos para la Comunidad</h2>
+    <p class="text-muted fs-5">En digitalpro ucayali apoyamos el crecimiento de tu negocio. Aprovecha estas herramientas sin costo alguno.</p>
+</div>
+
+<div class="row g-4 justify-content-center">
+    {% for servicio in servicios %}
+    <div class="col-md-5">
+        <div class="card h-100 shadow-sm border-start border-warning border-4">
+            <div class="card-body p-4 d-flex flex-column justify-content-between">
+                <div>
+                    <h4 class="fw-bold card-title text-dark">{{ servicio.nombre }}</h4>
+                    <p class="card-text text-muted fs-6 mt-3">{{ servicio.descripcion }}</p>
+                </div>
+                <div class="mt-4">
+                    <a href="https://wa.me/tu_numero" target="_blank" class="btn btn-outline-warning btn-sm fw-bold">
+                        <i class="bi bi-whatsapp"></i> Solicitar Información gratis
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

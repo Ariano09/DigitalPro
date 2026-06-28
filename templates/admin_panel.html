@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-dark"><i class="bi bi-sliders"></i> Panel de Administración Master</h2>
+    <a href="/admin/logout" class="btn btn-outline-danger btn-sm"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
+</div>
+
+<!-- Mensajes emergentes de confirmación -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="row g-4">
+    <!-- PANEL IZQUIERDO: FORMULARIOS DE REGISTRO -->
+    <div class="col-md-4">
+        
+        <!-- Formulario 1: Productos -->
+        <div class="card p-4 shadow-sm border-0 bg-white mb-4">
+            <h4 class="fw-bold text-primary mb-3"><i class="bi bi-plus-circle"></i> Nuevo Artículo</h4>
+            <form action="/admin/agregar-producto" method="POST">
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">Nombre del Producto</label>
+                    <input type="text" name="nombre" class="form-control" placeholder="Ej: Impresora Epson L3250" required>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">Precio</label>
+                    <input type="text" name="precio" class="form-control" placeholder="Ej: S/. 890" required>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">Categoría</label>
+                    <select name="categoria" class="form-select" required>
+                        <option value="computadora">Computadora</option>
+                        <option value="impresora">Impresora</option>
+                        <option value="otros">Otros Suministros</option>
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">Descripción Corta</label>
+                    <textarea name="descripcion" class="form-control" rows="3" placeholder="Detalles clave..." required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Imagen (URL)</label>
+                    <input type="url" name="imagen" class="form-control" placeholder="https://ejemplo.com/foto.jpg">
+                </div>
+                <button type="submit" class="btn btn-success w-100 fw-bold">Publicar Producto</button>
+            </form>
+        </div>
+
+        <!-- Formulario 2: Servicios Técnicos Especializados -->
+        <div class="card p-4 shadow-sm border-0 bg-white mb-4">
+            <h4 class="fw-bold text-info mb-3"><i class="bi bi-tools"></i> Nuevo Servicio Técnico</h4>
+            <form action="/admin/agregar-servicio-tecnico" method="POST">
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">Nombre del Servicio Técnico</label>
+                    <input type="text" name="nombre" class="form-control" placeholder="Ej: Reballing de Placa Madre" required>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">Descripción del Trabajo</label>
+                    <textarea name="descripcion" class="form-control" rows="3" placeholder="Detalles de la labor profesional que realizas..." required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Icono Visual (Bootstrap Icon)</label>
+                    <select name="icono" class="form-select">
+                        <option value="bi-cpu">Procesador (bi-cpu)</option>
+                        <option value="bi-printer">Impresora (bi-printer)</option>
+                        <option value="bi-router">Router / Redes (bi-router)</option>
+                        <option value="bi-pc-display">Pantalla PC (bi-pc-display)</option>
+                        <option value="bi-wrench-adjustable">Herramientas (bi-wrench-adjustable)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-info text-white w-100 fw-bold">Publicar Servicio Técnico</button>
+            </form>
+        </div>
+
+        <!-- Formulario 3: Servicios Gratuitos -->
+        <div class="card p-4 shadow-sm border-0 bg-white">
+            <h4 class="fw-bold text-warning mb-3"><i class="bi bi-gift"></i> Nuevo Servicio Gratis</h4>
+            <form action="/admin/agregar-servicio-gratis" method="POST">
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">Nombre del Beneficio</label>
+                    <input type="text" name="nombre" class="form-control" placeholder="Ej: Diagnóstico de laptops" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Descripción de qué incluye</label>
+                    <textarea name="descripcion" class="form-control" rows="3" placeholder="Detalle del regalo..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-warning text-dark w-100 fw-bold">Publicar Regalo</button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- PANEL DERECHO: EDICIÓN Y GESTIÓN EN LÍNEA -->
+    <div class="col-md-8">
+        
+        <!-- CONTROL 1: BANNERS PUBLICITARIOS -->
+        <div class="card p-4 shadow-sm border-0 bg-white mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold text-dark mb-0"><i class="bi bi-images"></i> Banners Publicitarios (Cabecera)</h4>
+                <a href="/admin/restaurar-banners" class="btn btn-sm btn-outline-secondary" onclick="return confirm('¿Deseas restablecer los 3 banners originales?')">Restaurar Originales</a>
+            </div>
+            
+            <div class="accordion" id="accordionBanners">
+                {% for banner in banners %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-bold text-secondary fs-7" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBanner{{ banner.id }}">
+                            Anuncio #{{ banner.id }}: {{ banner.titulo }}
+                        </button>
+                    </h2>
+                    <div id="collapseBanner{{ banner.id }}" class="accordion-collapse collapse" data-bs-parent="#accordionBanners">
+                        <div class="accordion-body bg-light">
+                            <form action="/admin/actualizar-banner/{{ banner.id }}" method="POST">
+                                <div class="row g-2">
+                                    <div class="col-md-4 text-center">
+                                        <img src="{{ banner.url_imagen }}" class="img-thumbnail mb-1" style="max-height: 100px; object-fit: cover; width: 100%;">
+                                        <small class="text-muted d-block fs-7">Miniatura actual</small>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="mb-1">
+                                            <label class="fs-7 fw-bold mb-0">Título Principal</label>
+                                            <input type="text" name="titulo" class="form-control form-control-sm" value="{{ banner.titulo }}" required>
+                                        </div>
+                                        <div class="mb-1">
+                                            <label class="fs-7 fw-bold mb-0">Subtítulo</label>
+                                            <input type="text" name="subtitulo" class="form-control form-control-sm" value="{{ banner.subtitulo }}" required>
+                                        </div>
+                                        <div class="mb-1">
+                                            <label class="fs-7 fw-bold mb-0">Enlace Imagen URL</label>
+                                            <input type="url" name="url_imagen" class="form-control form-control-sm" value="{{ banner.url_imagen }}" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-sm fw-bold w-100 mt-2">Guardar Banner #{{ banner.id }}</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- CONTROL 2: SERVICIOS TÉCNICOS ESPECIALIZADOS (COMERCIALES) -->
+        <div class="card p-4 shadow-sm border-0 bg-white mb-4">
+            <h4 class="fw-bold text-dark mb-3"><i class="bi bi-tools text-info"></i> Servicios Técnicos en Portada</h4>
+            <div class="table-responsive">
+                <table class="table align-middle table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Icono</th>
+                            <th>Servicio Técnico</th>
+                            <th>Descripción Profesional</th>
+                            <th class="text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for st in servicios_tecnicos %}
+                        <tr>
+                            <td class="text-info fs-4"><i class="bi {{ st.icono }}"></i></td>
+                            <td class="fw-bold text-dark fs-7" style="width: 25%;">{{ st.nombre }}</td>
+                            <td class="text-muted fs-7">{{ st.descripcion }}</td>
+                            <td class="text-center" style="width: 15%;">
+                                <a href="/admin/eliminar-servicio-tecnico/{{ st.id }}" class="btn btn-sm btn-outline-danger fs-7" onclick="return confirm('¿Quitar este servicio técnico de la web principal?')">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- CONTROL 3: SERVICIOS GRATUITOS -->
+        <div class="card p-4 shadow-sm border-0 bg-white mb-4">
+            <h4 class="fw-bold text-dark mb-3"><i class="bi bi-gift-fill text-warning"></i> Beneficios Gratuitos Activos</h4>
+            <div class="table-responsive">
+                <table class="table align-middle table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Título del Beneficio</th>
+                            <th>Descripción Ofrecida</th>
+                            <th class="text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for servicio in servicios_gratis %}
+                        <tr>
+                            <td class="fw-bold text-dark fs-7" style="width: 30%;">{{ servicio.nombre }}</td>
+                            <td class="text-muted fs-7">{{ servicio.descripcion }}</td>
+                            <td class="text-center" style="width: 15%;">
+                                <a href="/admin/eliminar-servicio-gratis/{{ servicio.id }}" class="btn btn-sm btn-outline-danger fs-7" onclick="return confirm('¿Quitar este regalo?')">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- CONTROL 4: INVENTARIO DE PRODUCTOS -->
+        <div class="card p-4 shadow-sm border-0 bg-white">
+            <h4 class="fw-bold text-dark mb-3"><i class="bi bi-box"></i> Inventario de Productos en Línea</h4>
+            <div class="table-responsive">
+                <table class="table align-middle table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Imagen</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Precio</th>
+                            <th class="text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for producto in productos %}
+                        <tr>
+                            <td><img src="{{ producto.imagen }}" style="width: 50px; height: 40px; object-fit: cover;" class="rounded border"></td>
+                            <td class="fw-bold text-dark fs-7">{{ producto.nombre }}</td>
+                            <td><span class="badge bg-secondary text-uppercase fs-7">{{ producto.categoria }}</span></td>
+                            <td class="text-success fw-bold fs-7">{{ producto.precio }}</td>
+                            <td class="text-center">
+                                <a href="/admin/eliminar-producto/{{ producto.id }}" class="btn btn-sm btn-danger fs-7" onclick="return confirm('¿Quitar este artículo de la web?')">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
